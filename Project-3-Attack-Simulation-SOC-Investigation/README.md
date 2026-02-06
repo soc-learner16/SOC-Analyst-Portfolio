@@ -98,22 +98,4 @@ The exercise strengthened understanding of endpoint telemetry analysis and SOC i
 
 ---
 
-## Investigation Evidence Snapshots
-
-The following screenshots capture key stages of the attack simulation and SOC investigation.
-
-### Payload Execution on Victim Machine
-![Payload Execution](Evidence/04_payload_execution.png)
-
-### Reverse Session Established
-![Reverse Session](Evidence/03_session_established.png)
-
-### Network Connection Observed in Logs
-![Network Connection](Evidence/07_sysmon_network_connection.png)
-
-### Active Connection Verification
-![Netstat Connection](Evidence/09_netstat_connection.png)
-
-### Session User Context
-![Whoami Output](Evidence/08_whoami_session.png)
 
