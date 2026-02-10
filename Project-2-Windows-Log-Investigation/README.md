@@ -90,3 +90,20 @@ This project demonstrates:
 
 ## ✅ Conclusion
 The investigation successfully reconstructed suspicious PowerShell script execution behavior and demonstrated practical SOC analyst investigation workflow using endpoint telemetry.
+
+---
+
+## Analyst Observations (Unique Findings)
+
+During the investigation, several behaviors helped illustrate how script-based activity can appear suspicious in endpoint telemetry:
+
+- PowerShell execution was observed with command-line arguments indicating execution policy bypass usage, a technique often abused by attackers to execute scripts unrestricted.
+- Script file creation events showed how payloads or administrative scripts may be staged locally before execution.
+- Correlation of command-line activity and PowerShell execution demonstrated how attackers may chain legitimate tools for malicious purposes.
+- Timeline reconstruction helped differentiate between normal administrative activity and suspicious scripted behavior.
+- Investigation highlighted the importance of monitoring command-line arguments rather than only process names when analyzing PowerShell activity.
+
+### Analyst Insight
+This simulation demonstrated how PowerShell-based activity can appear legitimate while being abused for malicious purposes. Effective SOC investigations require careful analysis of execution parameters, script behavior, and event correlation to distinguish administrative use from potential attack activity.
+
+---
