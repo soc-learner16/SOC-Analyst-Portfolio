@@ -79,6 +79,21 @@ Investigation revealed:
 
 ---
 
+## Analyst Observations (Unique Findings)
+
+During the safe attack simulation, several behaviors helped illustrate how attacker activity appears in endpoint telemetry:
+
+- Payload execution immediately generated process creation events, demonstrating how attacker tools appear as suspicious processes in logs.
+- Network connections between victim and attacker machines clearly showed how remote sessions appear in endpoint telemetry.
+- Parent-child process relationships helped identify abnormal execution chains following payload launch.
+- Correlating process execution and network activity allowed reconstruction of attacker interaction timeline.
+- Even harmless simulations generate telemetry similar to early-stage compromises seen in real investigations.
+
+### Analyst Insight
+This simulation demonstrated how early attacker activity becomes visible through process and network telemetry. Understanding these patterns helps SOC analysts quickly identify suspicious behavior and begin investigations before full compromise occurs.
+
+ ----
+
 ## Lessons Learned
 Key learning outcomes from this phase:
 
