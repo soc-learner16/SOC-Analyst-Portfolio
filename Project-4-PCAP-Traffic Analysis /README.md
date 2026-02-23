@@ -239,22 +239,30 @@ Repeated DNS queries and continuous encrypted communication indicate that the sy
 
 ---
 
-Unique Analytical Insight
+## 🧠 Unique Analytical Insight
 
-Even though the domain was not fully flagged as malicious, multiple behavioral indicators confirmed suspicious activity:
+Although the domain (`nfc.nfu829.com`) was not consistently flagged as malicious across all threat intelligence engines, multiple behavioral indicators within the network traffic strongly suggest suspicious activity.
 
-Repeated DNS queries
+### Observed Indicators:
 
-Use of cloud-hosted infrastructure
+* Repeated DNS queries to the same uncommon domain
+* Use of cloud-hosted infrastructure (myqcloud)
+* Encrypted outbound communication over HTTPS (TCP 443)
+* Presence of the same domain in TLS SNI during handshake
+* Persistent communication pattern with external IP
 
-Encrypted outbound communication
+### Analyst Interpretation:
 
-Presence of SNI matching suspicious domain
+Individually, these indicators may not confirm malicious activity. However, when correlated together, they form a strong behavioral pattern consistent with command-and-control (C2) communication.
 
-Persistent connection pattern
+### Key Insight:
 
-👉 This demonstrates a critical SOC skill:
-Detection ≠ Verdict → Behavior determines maliciousness
+👉 **Detection ≠ Verdict**
+👉 **Behavior determines maliciousness**
+
+This highlights an important SOC principle:
+Even when threat intelligence provides low or partial detection, network behavior analysis can reveal underlying malicious intent.
+
 
 ---
 
