@@ -4,16 +4,16 @@
 
 ## 📌 Objective
 
-The objective of this project is to analyze a network packet capture (PCAP) file associated with a potentially infected system, identify suspicious communication patterns, extract Indicators of Compromise (IoCs), and determine possible attacker behavior.
+The objective of this project is to analyze a network packet capture (PCAP) file from a potentially infected system, identify suspicious communication, extract Indicators of Compromise (IoCs), and determine attacker behavior using network traffic analysis.
 
 ---
 
 ## 🧪 Environment & Tools
 
 * **Tool Used:** Wireshark
-* **Data Source:** Malware Traffic Analysis dataset
-* **Analysis Type:** Static PCAP analysis (no execution of malware)
-* **Focus Areas:** DNS, TCP, TLS, Threat Intelligence
+* **Dataset:** Malware Traffic Analysis (Public Dataset)
+* **Analysis Type:** Static PCAP analysis
+* **Focus:** DNS, TCP, TLS, Threat Intelligence
 
 ---
 
@@ -21,14 +21,14 @@ The objective of this project is to analyze a network packet capture (PCAP) file
 
 The investigation followed a structured SOC workflow:
 
-1. Traffic triage
-2. Suspicious pattern identification
-3. Domain investigation
-4. DNS resolution tracking
-5. IP-based traffic analysis
-6. Encrypted communication inspection
-7. Threat intelligence validation
-8. Traffic behavior correlation
+1. Traffic triage (protocol-based filtering)
+2. Identification of anomalous domains
+3. DNS resolution tracking (CNAME + IP mapping)
+4. IP-based communication analysis
+5. TLS inspection (encrypted traffic analysis)
+6. Traffic behavior analysis
+7. Threat intelligence correlation
+8. Evidence-based conclusion
 
 ---
 
@@ -39,16 +39,21 @@ The investigation followed a structured SOC workflow:
   ```
   dns
   ```
-* Observed that internal host **10.10.2.101** was actively performing DNS queries
-* Most traffic appeared normal (Google, Firebase, etc.)
 
-### ⚠️ Key Observation
+### Observations:
 
-One domain stood out due to unusual naming pattern:
+* Internal host `10.10.2.101` actively querying DNS
+* Majority of domains appear legitimate (Google, Firebase, etc.)
 
-* `nfc.nfu829.com`
+### Key Finding:
 
-This does **not resemble legitimate service domains**
+A suspicious domain was identified:
+
+```
+nfc.nfu829.com
+```
+
+This domain does not match normal application/service patterns.
 
 ---
 
@@ -60,27 +65,27 @@ This does **not resemble legitimate service domains**
   dns.qry.name == "nfc.nfu829.com" || dns.resp.name == "nfc.nfu829.com"
   ```
 
-### Findings:
+### Observations:
 
 * Repeated DNS queries for the same domain
-* Indicates **persistent communication attempt**
+* Persistent resolution attempts
 
-### 🚩 Suspicion Indicators:
+### Suspicion Indicators:
 
-* Random-looking subdomain
-* Not associated with known trusted services
-* Repeated lookup behavior
+* Unusual/random naming structure
+* Not associated with known services
+* Repeated query behavior
 
 ---
 
 ## 🔗 Step 3 – DNS Resolution Chain Analysis
 
-The domain resolved through multiple layers:
+### Resolution Chain:
 
 ```
 nfc.nfu829.com
-  → wj-1357664701.cos.ap-singapore.myqcloud.com
-  → sgp.file.myqcloud.com
+ → wj-1357664701.cos.ap-singapore.myqcloud.com
+ → sgp.file.myqcloud.com
 ```
 
 ### Extracted IP Addresses:
@@ -90,52 +95,55 @@ nfc.nfu829.com
 * 101.32.105.193
 * 101.32.105.195
 
-### ⚠️ Key Insight:
+### Key Insight:
 
-* Use of **cloud infrastructure (Tencent Cloud / myqcloud)**
-* Common tactic used by attackers to **hide malicious infrastructure**
+* Use of **cloud infrastructure (myqcloud)**
+* Common technique to hide attacker servers
+* Multiple IPs indicate distributed hosting
 
 ---
 
 ## 🌍 Step 4 – IP Communication Analysis
 
-Filter used:
+* Applied filter:
 
-```
-ip.addr == 43.153.232.152
-```
+  ```
+  ip.addr == 43.153.232.152
+  ```
 
-### Findings:
+### Observations:
 
-* Active communication between:
+* Communication between:
 
-  * Internal host: `10.10.2.101`
-  * External server: `43.153.232.152`
-* Protocol: **TCP over port 443 (HTTPS)**
+  * `10.10.2.101` (internal host)
+  * `43.153.232.152` (external server)
+* Protocol: TCP over port 443 (HTTPS)
 
-### ⚠️ Key Insight:
+### Key Insight:
 
-* Encrypted communication → difficult to inspect payload
-* Suggests **command-and-control (C2) or data exfiltration**
+* Encrypted communication channel
+* Possible command-and-control traffic
 
 ---
 
-## 🔐 Step 5 – TLS Handshake Inspection
+## 🔐 Step 5 – TLS Handshake Analysis
 
-* Inspected TLS Client Hello packet
+### Findings:
 
-### Extracted Information:
+* TLS Client Hello packet observed
 
-* **SNI (Server Name Indication):**
+### Extracted:
+
+* **Server Name Indication (SNI):**
 
   ```
   nfc.nfu829.com
   ```
 
-### ⚠️ Key Insight:
+### Key Insight:
 
-* Even though traffic is encrypted, SNI exposes the domain
-* Confirms connection is targeting the suspicious domain
+* Confirms that encrypted traffic targets the suspicious domain
+* Even without payload visibility, domain identification is possible
 
 ---
 
@@ -145,55 +153,67 @@ Using Wireshark Conversations:
 
 ### Observations:
 
-* Multiple external IP communications
-* One IP showed **consistent and repeated interaction**
-* Data transfer present (not just DNS)
+* Repeated communication with specific external IP
+* Continuous data exchange (not a single request)
 
-### ⚠️ Key Insight:
+### Key Insight:
 
-* Indicates **established communication channel**
-* Not a one-time lookup → likely persistent behavior
+* Indicates persistent communication
+* Suggests possible beaconing behavior
 
 ---
 
-## 🧠 Step 7 – Threat Intelligence Correlation
+## 🧪 Step 7 – Threat Intelligence Correlation
 
-Checked domain using VirusTotal:
+* Tool: VirusTotal
 
 ### Result:
 
-* Domain flagged by **multiple security vendors (11/93)**
+* Domain flagged by **11/93 vendors**
 
-### ⚠️ Important Observation:
+### Important Observation:
 
-* Some engines marked it as clean
+* Some engines reported the domain as clean
 
-### 🔍 Analyst Interpretation:
+### Analyst Insight:
 
-* This is **not uncommon**
-* New or low-profile malware infrastructure may:
+* Low detection rate may indicate:
 
-  * Have **low detection rates**
-  * Be partially flagged
+  * New malware infrastructure
+  * Low reputation or recently registered domain
 
-👉 **Conclusion: Detection alone is not sufficient — behavioral analysis confirmed suspicion**
-
----
-
-## 🚨 Final Findings
-
-| Category           | Value                                       |
-| ------------------ | ------------------------------------------- |
-| Infected Host      | 10.10.2.101                                 |
-| Malicious Domain   | nfc.nfu829.com                              |
-| Infrastructure     | myqcloud (cloud hosting)                    |
-| Communication Type | HTTPS (Encrypted)                           |
-| Behavior           | Repeated DNS + persistent TCP communication |
-| Technique          | Likely C2 communication                     |
+👉 **Behavioral analysis confirmed suspicion beyond detection tools**
 
 ---
 
-## 🧩 Key Artifacts (IoCs)
+## 🧠 Attack Narrative (What Happened)
+
+The internal host (`10.10.2.101`) initiated DNS queries to a suspicious domain (`nfc.nfu829.com`).
+
+The domain resolved through multiple cloud-based layers (myqcloud infrastructure), eventually mapping to external IP addresses.
+
+Following resolution, the host established encrypted HTTPS communication with one of the resolved IPs (`43.153.232.152`).
+
+TLS analysis revealed that the communication explicitly targeted the suspicious domain via SNI.
+
+Repeated DNS queries and continuous encrypted communication indicate that the system is likely maintaining a persistent connection with attacker-controlled infrastructure.
+
+👉 This behavior is consistent with **command-and-control (C2) communication**
+
+---
+
+## 🚩 Why This Activity is Suspicious
+
+* Domain uses non-standard/random naming pattern
+* Hosted on cloud infrastructure (common attacker tactic)
+* Multiple DNS resolutions (possible evasion/load balancing)
+* Encrypted HTTPS traffic hides payload
+* Persistent communication behavior
+* Partial VirusTotal detection (possible emerging threat)
+
+---
+
+## 🧩 Indicators of Compromise (IoCs)
 
 ### Domains:
 
@@ -210,36 +230,61 @@ Checked domain using VirusTotal:
 
 ---
 
-## 🧠 Unique Analytical Insight
+## 🧬 MITRE ATT&CK Mapping
 
-Even though the domain was **not fully flagged as malicious**, multiple behavioral indicators confirmed suspicious activity:
+* **T1071.001** – Application Layer Protocol: Web (HTTPS)
+* **T1071.004** – DNS
+* **T1573** – Encrypted Channel (TLS communication)
+* **T1090** – Proxy (Cloud infrastructure usage)
 
-* Repeated DNS queries
-* Use of cloud-hosted infrastructure
-* Encrypted outbound communication
-* Presence of SNI matching suspicious domain
-* Persistent connection pattern
+---
+
+Unique Analytical Insight
+
+Even though the domain was not fully flagged as malicious, multiple behavioral indicators confirmed suspicious activity:
+
+Repeated DNS queries
+
+Use of cloud-hosted infrastructure
+
+Encrypted outbound communication
+
+Presence of SNI matching suspicious domain
+
+Persistent connection pattern
 
 👉 This demonstrates a critical SOC skill:
-**Detection ≠ Verdict → Behavior determines maliciousness**
+Detection ≠ Verdict → Behavior determines maliciousness
 
 ---
 
 ## 🛡️ Recommendations
 
-* Block identified domains and IP addresses
+* Block identified domains and IPs
 * Monitor DNS queries for similar patterns
-* Inspect TLS SNI in network monitoring tools
-* Implement alerting for unusual domain patterns
-* Apply threat intelligence correlation in SOC workflows
+* Inspect TLS SNI for suspicious domains
+* Implement network detection rules
+* Use threat intelligence correlation for alerts
 
 ---
 
 ## 📌 Conclusion
 
-The investigation reveals that the internal system is communicating with a suspicious external domain hosted on cloud infrastructure. The communication pattern, encryption usage, and DNS behavior strongly indicate potential command-and-control (C2) activity.
+The investigation reveals that the internal system is communicating with a suspicious domain hosted on cloud infrastructure.
 
-This analysis highlights the importance of combining **network behavior analysis with threat intelligence**, rather than relying solely on automated detections.
+The combination of DNS behavior, encrypted communication, and threat intelligence strongly indicates **malware-related command-and-control (C2) activity**.
+
+This analysis demonstrates the importance of combining **network behavior analysis with threat intelligence**, rather than relying solely on automated detection tools.
 
 ---
 
+## 🏁 Skills Demonstrated
+
+* Network Traffic Analysis
+* DNS Investigation
+* TLS Analysis
+* Threat Intelligence Correlation
+* IOC Extraction
+* SOC Investigation Workflow
+
+---
