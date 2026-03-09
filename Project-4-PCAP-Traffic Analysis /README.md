@@ -181,7 +181,7 @@ Persistent traffic patterns suggest **beaconing behavior typical of malware comm
 
 ### Evidence
 
-![Conversation Statistics](evidence/07_conversation_statistics.png)
+![conversation statistics](evidence/07_conversation_statistics.png)
 
 ---
 
