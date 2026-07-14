@@ -1,5 +1,5 @@
 
-# SOC Investigation – Suspicious mshta.exe Execution
+# Suspicious mshta.exe Execution
 
 ## 📌 Executive Summary
 
