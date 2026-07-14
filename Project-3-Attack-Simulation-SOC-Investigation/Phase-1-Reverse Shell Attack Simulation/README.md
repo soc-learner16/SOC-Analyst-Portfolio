@@ -1,4 +1,4 @@
-# Phase 1 – Safe Attack Simulation & SOC Investigation
+# Phase 1 – Reverse Shell Attack Simulation
 
 ## Objective
 The objective of this phase was to safely simulate an attacker compromising a system in a controlled lab environment and investigate the resulting activity as a Security Operations Center (SOC) analyst.
