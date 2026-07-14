@@ -26,7 +26,7 @@ The objective is to simulate realistic attack behavior and demonstrate how a SOC
 
 ## Project Phases
 
-### Phase 1 – Safe Attack Simulation
+### Phase 1 – Reverse Shell Attack Simulation
 In Phase 1, safe attack simulations were conducted to understand how malicious activity appears in system logs.
 
 Focus areas:
@@ -35,11 +35,11 @@ Focus areas:
 - Log collection
 - Understanding baseline system behavior
 
-📂 Folder: `Phase-1-Safe-Attack-Simulation`
+📂 Folder: `Phase-1-Reverse Shell Attack Simulation`
 
 ---
 
-### Phase 2 – Malware Execution Investigation
+### Phase 2 – Malware Execution & Endpoint Investigation
 In Phase 2, a malware execution scenario was investigated using endpoint telemetry to simulate real SOC incident response.
 
 Focus areas:
@@ -50,7 +50,7 @@ Focus areas:
 - Incident containment
 - Endpoint recovery
 
-📂 Folder: `Phase-2-Malware-Execution-Investigation`
+📂 Folder: `Phase-2-Malware Execution & Endpoint Investigation`
 
 ---
 
